@@ -14,5 +14,8 @@ namespace Donify.API.Models.Entities
         public DateTime RegisteredAt { get; set; }
         public bool IsActive { get; set; } = true;
 
+        public ICollection<Donation> Donations { get; set; } = new List<Donation>();
+
     }
+
 }
