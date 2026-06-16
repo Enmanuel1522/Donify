@@ -19,3 +19,5 @@ namespace Donify.API.Models.Entities
     }
 
 }
+
+

@@ -1,3 +1,7 @@
+using Donify.API.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+
 namespace Donify.API
 {
     public class Program
@@ -6,6 +10,7 @@ namespace Donify.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             // Add services to the container.
            
             builder.Services.AddControllers();
@@ -17,15 +22,17 @@ namespace Donify.API
 
             // Configure the HTTP request pipeline.
 
-            app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseHttpsRedirection();
+
+            app.UseAuthorization();
+
+
                
             app.MapControllers();
 
