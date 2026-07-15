@@ -1,5 +1,5 @@
 ﻿using Donify.API.Data;
-using Donify.API.Models.DTOs;
+using Donify.API.DTOs;
 using Donify.API.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 

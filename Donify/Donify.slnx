@@ -1,3 +1,5 @@
 <Solution>
   <Project Path="Donify.API/Donify.API.csproj" />
+  <Project Path="Donify.Domain/Donify.Domain.csproj" Id="5487ce49-460a-4755-a8b5-1c195a235018" />
+  <Project Path="Donify.Infrastucture/Donify.Infrastucture.csproj" Id="57e54f92-f4c6-467e-b8b9-c04e64657095" />
 </Solution>

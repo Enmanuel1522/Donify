@@ -1,8 +1,10 @@
-﻿namespace Donify.API.Models.Entities
+﻿using Donify.Domain.Core;
+
+namespace Donify.API.Models.Entities
 {
-    public class Campaign
+    public class Campaign : HasId
     {
-        public int Id { get; set; }
+        
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public decimal GoalAmount { get; set; }

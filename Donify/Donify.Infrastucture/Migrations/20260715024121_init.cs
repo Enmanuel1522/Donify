@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Donify.API.Migrations
+namespace Donify.Infrastucture.Migrations
 {
     /// <inheritdoc />
     public partial class init : Migration

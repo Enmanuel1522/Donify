@@ -1,8 +1,9 @@
-﻿namespace Donify.API.Models.Entities
+﻿using Donify.Domain.Core;
+
+namespace Donify.API.Models.Entities
 {
-    public class Donation
+    public class Donation : HasId
     {
-        public int Id { get; set; }
 
         public int DonorId { get; set; }
         public Donor? Donor { get; set; }
