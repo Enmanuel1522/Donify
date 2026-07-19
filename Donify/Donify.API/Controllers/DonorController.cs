@@ -5,6 +5,7 @@ using Donify.API.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
+using Donify.Application.Services;
 
 namespace Donify.API.Controllers
 {
@@ -27,19 +28,8 @@ namespace Donify.API.Controllers
         {
             var donor = await _uow.Donors.GetByIdAsync(id);
 
-            if (donor == null) 
-            { 
-                return NotFound($"No se encontro un donante con id {id}");
-            }
-            var dto = new DonorDto
-            {
-                Id = donor.Id,
-                FirstName = donor.FirstName,
-                LastNeme = donor.LastNeme,
-                Email = donor.Email
-            };
-
-            return Ok(dto);
+          
+            return Ok(donor);
         }
 
         
@@ -49,7 +39,7 @@ namespace Donify.API.Controllers
             var donor = new Donor
             {
                 FirstName = dto.FirstName,
-                LastNeme = dto.LastNeme,
+                LastName = dto.LastName,
                 Email = dto.Email,
                 DonorType = "Individual",
                 RegisteredAt = DateTime.UtcNow,
@@ -77,7 +67,7 @@ namespace Donify.API.Controllers
                 return NotFound($"No se encontró un donante con id {id}");
             }
             donor.FirstName = dto.FirstName;
-            donor.LastNeme = dto.LastNeme;
+            donor.LastName = dto.LastName;
             donor.Email = dto.Email;
 
             await _uow.SaveAsync();

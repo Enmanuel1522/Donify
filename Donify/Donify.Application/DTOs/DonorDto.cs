@@ -9,7 +9,7 @@ namespace Donify.API.DTOs
         [Required(ErrorMessage = "El campo id esta vacio")]
         public int Id { get; set; }
         public string? FirstName { get; set; }
-        public string? LastNeme { get; set; }
+        public string? LastName { get; set; }
         public string Email { get; set; } = string.Empty;
 
     }

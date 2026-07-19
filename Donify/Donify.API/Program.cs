@@ -1,6 +1,8 @@
 using Donify.API.Data;
 using Donify.API.Repositories;
 using Donify.API.Repositories.Interfaces;
+using Donify.Application.Interfaces;
+using Donify.Application.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -25,13 +27,24 @@ namespace Donify.API
             builder.Services.AddScoped<IReceiptRepository, ReceiptRepository>();
             builder.Services.AddScoped<IStaffRepository, StaffRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
-     
-            
-          
-           
+
+
+
+            builder.Services.AddScoped<IDonorService, DonorService>();
+            builder.Services.AddScoped<IDonationService, DonationService>();
+            builder.Services.AddScoped<ICampaignService, CampaignService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<IProjectService, ProjectService>();
+            builder.Services.AddScoped<IStaffService, StaffService>();
+            builder.Services.AddScoped<IReceiptService, ReceiptService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+
+
+
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
 
 
             var app = builder.Build();
