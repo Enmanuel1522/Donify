@@ -8,10 +8,10 @@ namespace Donify.API.Repositories
     {
         private readonly DataContext _context;
 
-        public IDonationRepository Donors { get; set; }
+        public IDonorRepository Donors { get; set; }
         public IDonationRepository Donations { get; set; }
         public ICampaignRepository Campaigns { get; set; }
-        public ICampaignRepository Categories { get; set; }
+        public ICategoryRepository Categories { get; set; }
         public IProjectRepository Projects { get; set; }
         public IStaffRepository Staffs { get; set; }
         public IReceiptRepository Receipts { get; set; }
@@ -20,10 +20,10 @@ namespace Donify.API.Repositories
         public UnitOfWork(  
             DataContext context, 
 
-            IDonationRepository Donors,
+            IDonorRepository Donors,
             IDonationRepository Donations,
             ICampaignRepository Campaigns,
-            ICampaignRepository Categories,
+            ICategoryRepository Categories,
             IProjectRepository Projects,
             IStaffRepository Staffs,
             IReceiptRepository Receipts,

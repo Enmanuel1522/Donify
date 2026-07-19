@@ -1,6 +1,7 @@
 ﻿using Donify.API.Data;
 using Donify.API.DTOs;
 using Donify.API.Models.Entities;
+using Donify.API.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Donify.API.Controllers
@@ -9,17 +10,17 @@ namespace Donify.API.Controllers
     [Route("api/[Controller]")]
     public class DonationController : ControllerBase
     {
-        private readonly DataContext _context;
+        private readonly IUnitOfWork _uow;
 
-        public DonationController(DataContext context)
+        public DonationController(IUnitOfWork uow)
         {
-            _context = context;
+            _uow = uow;
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<DonationDto>> GetDonation(int id)
         {
-            var donation = await _context.Donations.FindAsync(id);
+            var donation = await _uow.Donations.GetByIdAsync(id);
             if (donation == null)
             {
                 return NotFound($"No se encontró una donación con id {id}");
@@ -39,7 +40,7 @@ namespace Donify.API.Controllers
         [HttpPost]
         public async Task<ActionResult<DonationDto>> CreateDonation(DonationDto dto)
         {
-            var donorExists = await _context.Donors.FindAsync(dto.DonorId);
+            var donorExists = await _uow.Donors.GetByIdAsync(dto.DonorId);
             if (donorExists == null)
             {
                 return NotFound($"No se encontró un donante con id {dto.DonorId}");
@@ -55,8 +56,8 @@ namespace Donify.API.Controllers
                 Type = "General",
                 PaymentMethod = "Unknown"
             };
-            _context.Donations.Add(donation);
-            await _context.SaveChangesAsync();
+            await _uow.Donations.AddAsync(donation);
+            await _uow.SaveAsync();
             dto.Id = donation.Id;
             return CreatedAtAction(nameof(GetDonation), new { id = donation.Id }, dto);
         }
@@ -68,7 +69,7 @@ namespace Donify.API.Controllers
             {
                 return BadRequest("El id de la ruta no coincide con el del cuerpo");
             }
-            var donation = await _context.Donations.FindAsync(id);
+            var donation = await _uow.Donations.GetByIdAsync(id);
             if (donation == null)
             {
                 return NotFound($"No se encontró una donación con id {id}");
@@ -76,20 +77,20 @@ namespace Donify.API.Controllers
             donation.Amount = dto.Amount;
             donation.Description = dto.Description;
             donation.Status = dto.Status;
-            await _context.SaveChangesAsync();
+            await _uow.SaveAsync();
             return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDonation(int id)
         {
-            var donation = await _context.Donations.FindAsync(id);
+            var donation = await _uow.Donations.GetByIdAsync(id);
             if (donation == null)
             {
                 return NotFound($"No se encontró una donación con id {id}");
             }
-            _context.Donations.Remove(donation);
-            await _context.SaveChangesAsync();
+            await _uow.Donations.DeleteAsync(donation.Id);
+            await _uow.SaveAsync();
             return NoContent();
         }
     }

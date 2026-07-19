@@ -1,7 +1,9 @@
 ﻿using Donify.API.Data;
 using Donify.API.DTOs;
 using Donify.API.Models.Entities;
+using Donify.API.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 
 namespace Donify.API.Controllers
@@ -10,11 +12,12 @@ namespace Donify.API.Controllers
     [Route("api/[Controller]")]
     public class DonorController : ControllerBase
     {
-        private readonly DataContext _context;
+        public IUnitOfWork _uow;
 
-        public DonorController(DataContext context)
+
+        public DonorController(IUnitOfWork uow)
         {
-            _context = context;
+            _uow = uow;
 
         }
 
@@ -22,7 +25,7 @@ namespace Donify.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<DonorDto>> GetDonor(int id)
         {
-            var donor = await _context.Donors.FindAsync(id);
+            var donor = await _uow.Donors.GetByIdAsync(id);
 
             if (donor == null) 
             { 
@@ -53,8 +56,8 @@ namespace Donify.API.Controllers
                 IsActive = true
             };
 
-            _context.Donors.Add(donor);
-            await _context.SaveChangesAsync();
+            await _uow.Donors.AddAsync(donor);
+            await _uow.SaveAsync();
 
             dto.Id = donor.Id;
 
@@ -68,7 +71,7 @@ namespace Donify.API.Controllers
             { 
                 return BadRequest("El id de la ruta no coincide con el del cuerpo");
             }
-            var donor = await _context.Donors.FindAsync(id);
+            var donor = await _uow.Donors.GetByIdAsync(id);
             if (donor == null) 
             { 
                 return NotFound($"No se encontró un donante con id {id}");
@@ -77,7 +80,7 @@ namespace Donify.API.Controllers
             donor.LastNeme = dto.LastNeme;
             donor.Email = dto.Email;
 
-            await _context.SaveChangesAsync();
+            await _uow.SaveAsync();
 
             return NoContent();
         }
@@ -86,13 +89,13 @@ namespace Donify.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDonor(int id)
         {
-            var donor = await _context.Donors.FindAsync(id);
+            var donor = await _uow.Donors.GetByIdAsync(id);
             if (donor == null) 
             { 
                 return NotFound($"No se encontró un donante con id {id}");
             }
-            _context.Donors.Remove(donor);
-            await _context.SaveChangesAsync();
+            await _uow.Donors.DeleteAsync(donor.Id);
+            await _uow.SaveAsync();
 
             return NoContent();
         }

@@ -14,10 +14,8 @@ namespace Donify.API.DTOs
         public string Description { get; set; } = string.Empty;
 
         [Required]
-        [Range(0.01, double.MaxValue, ErrorMessage = "RequiredBudget must be greater than 0")]
         public decimal RequiredBudget { get; set; }
 
-        [Range(0, double.MaxValue)]
         public decimal AssignedBudget { get; set; }
 
         [Required]
