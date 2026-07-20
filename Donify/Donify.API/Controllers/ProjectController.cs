@@ -1,64 +1,42 @@
-﻿using Donify.API.Data;
-using Donify.API.DTOs;
-using Donify.API.Models.Entities;
-using Donify.API.Repositories.Interfaces;
+﻿using Donify.Application.DTOs;
+using Donify.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Donify.API.Controllers
 {
     [ApiController]
-    [Route("api/[Controller]")]
+    [Route("api/[controller]")]
     public class ProjectController : ControllerBase
     {
-        private readonly IUnitOfWork _uow;
+        private readonly IProjectService _projectService;
 
-        public ProjectController(IUnitOfWork uow)
+        public ProjectController(IProjectService projectService)
         {
-            _uow = uow;
+            _projectService = projectService;
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ProjectDto>> GetProject(int id)
         {
-            var project = await _uow.Projects.GetByIdAsync(id);
+            var project = await _projectService.GetByIdAsync(id);
             if (project == null)
                 return NotFound($"No se encontró un proyecto con id {id}");
 
-            var dto = new ProjectDto
-            {
-                Id = project.Id,
-                Name = project.Name,
-                Description = project.Description,
-                RequiredBudget = project.RequiredBudget,
-                AssignedBudget = project.AssignedBudget,
-                StartDate = project.StartDate,
-                EndDate = project.EndDate,
-                Status = project.Status,
-                StaffId = project.StaffId
-            };
-            return Ok(dto);
+            return Ok(project);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ProjectDto>>> GetAllProjects()
+        {
+            var projects = await _projectService.GetAllAsync();
+            return Ok(projects);
         }
 
         [HttpPost]
         public async Task<ActionResult<ProjectDto>> CreateProject(ProjectDto dto)
         {
-            var project = new Project
-            {
-                Name = dto.Name,
-                Description = dto.Description,
-                RequiredBudget = dto.RequiredBudget,
-                AssignedBudget = dto.AssignedBudget,
-                StartDate = dto.StartDate,
-                EndDate = dto.EndDate,
-                Status = dto.Status,
-                StaffId = dto.StaffId
-            };
-
-            await _uow.Projects.AddAsync(project);
-            await _uow.SaveAsync();
-
-            dto.Id = project.Id;
-            return CreatedAtAction(nameof(GetProject), new { id = project.Id }, dto);
+            var created = await _projectService.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetProject), new { id = created.Id }, created);
         }
 
         [HttpPut("{id}")]
@@ -67,35 +45,14 @@ namespace Donify.API.Controllers
             if (id != dto.Id)
                 return BadRequest("El id de la ruta no coincide con el del cuerpo");
 
-            var project = await _uow.Projects.GetByIdAsync(id);
-            if (project == null)
-                return NotFound($"No se encontró un proyecto con id {id}");
-
-            project.Name = dto.Name;
-            project.Description = dto.Description;
-            project.RequiredBudget = dto.RequiredBudget;
-            project.AssignedBudget = dto.AssignedBudget;
-            project.StartDate = dto.StartDate;
-            project.EndDate = dto.EndDate;
-            project.Status = dto.Status;
-            project.StaffId = dto.StaffId;
-
-            await _uow.Projects.UpdateAsync(project);
-            await _uow.SaveAsync();
-
+            await _projectService.UpdateAsync(id, dto);
             return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProject(int id)
         {
-            var project = await _uow.Projects.GetByIdAsync(id);
-            if (project == null)
-                return NotFound($"No se encontró un proyecto con id {id}");
-
-            await _uow.Projects.DeleteAsync(id);
-            await _uow.SaveAsync();
-
+            await _projectService.DeleteAsync(id);
             return NoContent();
         }
     }

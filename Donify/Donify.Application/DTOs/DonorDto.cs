@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Donify.API.DTOs
+namespace Donify.Application.DTOs
 {
     public class DonorDto
     {

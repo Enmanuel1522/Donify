@@ -1,4 +1,4 @@
-﻿using Donify.API.DTOs;
+﻿using Donify.Application.DTOs;
 
 namespace Donify.Application.Interfaces
 {

@@ -1,97 +1,59 @@
-﻿using Donify.API.Data;
-using Donify.API.DTOs;
-using Donify.API.Models.Entities;
-using Donify.API.Repositories.Interfaces;
+﻿using Donify.Application.DTOs;
+using Donify.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.EntityFrameworkCore;
-using Donify.Application.Services;
 
 namespace Donify.API.Controllers
 {
     [ApiController]
-    [Route("api/[Controller]")]
+    [Route("api/[controller]")]
     public class DonorController : ControllerBase
     {
-        public IUnitOfWork _uow;
+        private readonly IDonorService _donorService;
 
-
-        public DonorController(IUnitOfWork uow)
+        public DonorController(IDonorService donorService)
         {
-            _uow = uow;
-
+            _donorService = donorService;
         }
 
-        
         [HttpGet("{id}")]
         public async Task<ActionResult<DonorDto>> GetDonor(int id)
         {
-            var donor = await _uow.Donors.GetByIdAsync(id);
+            var donor = await _donorService.GetByIdAsync(id);
+            if (donor == null)
+                return NotFound($"No se encontró un donante con id {id}");
 
-          
             return Ok(donor);
         }
 
-        
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<DonorDto>>> GetAllDonors()
+        {
+            var donors = await _donorService.GetAllAsync();
+            return Ok(donors);
+        }
+
         [HttpPost]
         public async Task<ActionResult<DonorDto>> CreateDonor(DonorDto dto)
         {
-            var donor = new Donor
-            {
-                FirstName = dto.FirstName,
-                LastName = dto.LastName,
-                Email = dto.Email,
-                DonorType = "Individual",
-                RegisteredAt = DateTime.UtcNow,
-                IsActive = true
-            };
-
-            await _uow.Donors.AddAsync(donor);
-            await _uow.SaveAsync();
-
-            dto.Id = donor.Id;
-
-            return CreatedAtAction(nameof(GetDonor), new { id = donor.Id }, dto);
+            var created = await _donorService.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetDonor), new { id = created.Id }, created);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateDonor(int id, DonorDto dto)
         {
-            if (id != dto.Id) 
-            { 
+            if (id != dto.Id)
                 return BadRequest("El id de la ruta no coincide con el del cuerpo");
-            }
-            var donor = await _uow.Donors.GetByIdAsync(id);
-            if (donor == null) 
-            { 
-                return NotFound($"No se encontró un donante con id {id}");
-            }
-            donor.FirstName = dto.FirstName;
-            donor.LastName = dto.LastName;
-            donor.Email = dto.Email;
 
-            await _uow.SaveAsync();
-
+            await _donorService.UpdateAsync(id, dto);
             return NoContent();
         }
-
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDonor(int id)
         {
-            var donor = await _uow.Donors.GetByIdAsync(id);
-            if (donor == null) 
-            { 
-                return NotFound($"No se encontró un donante con id {id}");
-            }
-            await _uow.Donors.DeleteAsync(donor.Id);
-            await _uow.SaveAsync();
-
+            await _donorService.DeleteAsync(id);
             return NoContent();
         }
-
     }
 }
-
-
-

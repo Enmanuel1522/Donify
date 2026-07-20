@@ -1,60 +1,42 @@
-﻿using Donify.API.Data;
-using Donify.API.DTOs;
-using Donify.API.Models.Entities;
-using Donify.API.Repositories.Interfaces;
+﻿using Donify.Application.DTOs;
+using Donify.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Donify.API.Controllers
 {
     [ApiController]
-    [Route("api/[Controller]")]
+    [Route("api/[controller]")]
     public class ReceiptController : ControllerBase
     {
-        private readonly IUnitOfWork _uow;
+        private readonly IReceiptService _receiptService;
 
-        public ReceiptController(IUnitOfWork uow)
+        public ReceiptController(IReceiptService receiptService)
         {
-            _uow = uow;
+            _receiptService = receiptService;
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ReceiptDto>> GetReceipt(int id)
         {
-            var receipt = await _uow.Receipts.GetByIdAsync(id);
+            var receipt = await _receiptService.GetByIdAsync(id);
             if (receipt == null)
                 return NotFound($"No se encontró un recibo con id {id}");
 
-            var dto = new ReceiptDto
-            {
-                Id = receipt.Id,
-                DonationId = receipt.DonationId,
-                ReceiptNumber = receipt.ReceiptNumber,
-                IssuedAt = receipt.IssuedAt,
-                SentByEmail = receipt.SentByEmail
-            };
-            return Ok(dto);
+            return Ok(receipt);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ReceiptDto>>> GetAllReceipts()
+        {
+            var receipts = await _receiptService.GetAllAsync();
+            return Ok(receipts);
         }
 
         [HttpPost]
         public async Task<ActionResult<ReceiptDto>> CreateReceipt(ReceiptDto dto)
         {
-            var donationExists = await _uow.Donations.GetByIdAsync(dto.DonationId);
-            if (donationExists == null)
-                return NotFound($"No se encontró una donación con id {dto.DonationId}");
-
-            var receipt = new Receipt
-            {
-                DonationId = dto.DonationId,
-                ReceiptNumber = dto.ReceiptNumber,
-                IssuedAt = DateTime.UtcNow,
-                SentByEmail = false
-            };
-
-            await _uow.Receipts.AddAsync(receipt);
-            await _uow.SaveAsync();
-
-            dto.Id = receipt.Id;
-            return CreatedAtAction(nameof(GetReceipt), new { id = receipt.Id }, dto);
+            var created = await _receiptService.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetReceipt), new { id = created.Id }, created);
         }
 
         [HttpPut("{id}")]
@@ -63,29 +45,14 @@ namespace Donify.API.Controllers
             if (id != dto.Id)
                 return BadRequest("El id de la ruta no coincide con el del cuerpo");
 
-            var receipt = await _uow.Receipts.GetByIdAsync(id);
-            if (receipt == null)
-                return NotFound($"No se encontró un recibo con id {id}");
-
-            receipt.ReceiptNumber = dto.ReceiptNumber;
-            receipt.SentByEmail = dto.SentByEmail;
-
-            await _uow.Receipts.UpdateAsync(receipt);
-            await _uow.SaveAsync();
-
+            await _receiptService.UpdateAsync(id, dto);
             return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteReceipt(int id)
         {
-            var receipt = await _uow.Receipts.GetByIdAsync(id);
-            if (receipt == null)
-                return NotFound($"No se encontró un recibo con id {id}");
-
-            await _uow.Receipts.DeleteAsync(id);
-            await _uow.SaveAsync();
-
+            await _receiptService.DeleteAsync(id);
             return NoContent();
         }
     }

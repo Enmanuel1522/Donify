@@ -1,64 +1,42 @@
-﻿using Donify.API.Data;
-using Donify.API.DTOs;
-using Donify.API.Models.Entities;
-using Donify.API.Repositories.Interfaces;
+﻿using Donify.Application.DTOs;
+using Donify.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Donify.API.Controllers
 {
     [ApiController]
-    [Route("api/[Controller]")]
+    [Route("api/[controller]")]
     public class CampaignController : ControllerBase
     {
-        private readonly IUnitOfWork _uow;
+        private readonly ICampaignService _campaignService;
 
-        public CampaignController(IUnitOfWork uow)
+        public CampaignController(ICampaignService campaignService)
         {
-            _uow = uow;
+            _campaignService = campaignService;
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<CampaignDto>> GetCampaign(int id)
         {
-            var campaign = await _uow.Campaigns.GetByIdAsync(id);
+            var campaign = await _campaignService.GetByIdAsync(id);
             if (campaign == null)
                 return NotFound($"No se encontró una campaña con id {id}");
 
-            var dto = new CampaignDto
-            {
-                Id = campaign.Id,
-                Name = campaign.Name,
-                Description = campaign.Description,
-                GoalAmount = campaign.GoalAmount,
-                CollectedAmount = campaign.CollectedAmount,
-                StartDate = campaign.StartDate,
-                EndDate = campaign.EndDate,
-                Status = campaign.Status.ToString(),
-                CategoryId = campaign.CategoryId
-            };
-            return Ok(dto);
+            return Ok(campaign);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<CampaignDto>>> GetAllCampaigns()
+        {
+            var campaigns = await _campaignService.GetAllAsync();
+            return Ok(campaigns);
         }
 
         [HttpPost]
         public async Task<ActionResult<CampaignDto>> CreateCampaign(CampaignDto dto)
         {
-            var campaign = new Campaign
-            {
-                Name = dto.Name,
-                Description = dto.Description,
-                GoalAmount = dto.GoalAmount,
-                CollectedAmount = 0,
-                StartDate = dto.StartDate,
-                EndDate = dto.EndDate,
-                Status = CampaignStatus.Active,
-                CategoryId = dto.CategoryId
-            };
-
-            await _uow.Campaigns.AddAsync(campaign);
-            await _uow.SaveAsync();
-
-            dto.Id = campaign.Id;
-            return CreatedAtAction(nameof(GetCampaign), new { id = campaign.Id }, dto);
+            var created = await _campaignService.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetCampaign), new { id = created.Id }, created);
         }
 
         [HttpPut("{id}")]
@@ -67,33 +45,14 @@ namespace Donify.API.Controllers
             if (id != dto.Id)
                 return BadRequest("El id de la ruta no coincide con el del cuerpo");
 
-            var campaign = await _uow.Campaigns.GetByIdAsync(id);
-            if (campaign == null)
-                return NotFound($"No se encontró una campaña con id {id}");
-
-            campaign.Name = dto.Name;
-            campaign.Description = dto.Description;
-            campaign.GoalAmount = dto.GoalAmount;
-            campaign.StartDate = dto.StartDate;
-            campaign.EndDate = dto.EndDate;
-            campaign.CategoryId = dto.CategoryId;
-
-            await _uow.Campaigns.UpdateAsync(campaign);
-            await _uow.SaveAsync();
-
+            await _campaignService.UpdateAsync(id, dto);
             return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCampaign(int id)
         {
-            var campaign = await _uow.Campaigns.GetByIdAsync(id);
-            if (campaign == null)
-                return NotFound($"No se encontró una campaña con id {id}");
-
-            await _uow.Campaigns.DeleteAsync(id);
-            await _uow.SaveAsync();
-
+            await _campaignService.DeleteAsync(id);
             return NoContent();
         }
     }

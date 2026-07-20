@@ -1,10 +1,10 @@
-﻿using Donify.API.Data;
-using Donify.API.Models.Entities;
-using Donify.API.Repositories.Interfaces;
+﻿using Donify.Infrastructure.Context;
+using Donify.Domain.Entities;
+using Donify.Domain.Repository;
 using Microsoft.EntityFrameworkCore;
 using System;
 
-namespace Donify.API.Repositories
+namespace Donify.Infrastructure.Repositories
 {
     public class UserRepository : GenericRepository<User>, IUserRepository
     {

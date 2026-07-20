@@ -1,6 +1,6 @@
-﻿using Donify.API.Models.Entities;
+﻿using Donify.Domain.Entities;
 
-namespace Donify.API.Repositories.Interfaces
+namespace Donify.Domain.Repository
 {
     public interface IReceiptRepository : IGenericRepository<Receipt>
     {

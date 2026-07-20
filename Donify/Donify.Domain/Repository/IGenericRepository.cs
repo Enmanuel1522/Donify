@@ -1,4 +1,4 @@
-﻿namespace Donify.API.Repositories.Interfaces
+﻿namespace Donify.Domain.Repository
 {
     public interface IGenericRepository<T> where T : class
     {

@@ -1,7 +1,7 @@
-﻿using Donify.API.Models.Entities;
+﻿using Donify.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
 
-namespace Donify.API.DTOs
+namespace Donify.Application.DTOs
 {
     public class DonationDto
     {
@@ -9,8 +9,8 @@ namespace Donify.API.DTOs
         [Required(ErrorMessage = "El campo id esta vacio")]
         public int Id { get; set; }
         public int DonorId { get; set; }
-        public Donor? Donor { get; set; }
 
+        [Required]
         public decimal Amount { get; set; }
         public string? Description { get; set; }
         public DateTime DonatedAt { get; set; } = DateTime.UtcNow;

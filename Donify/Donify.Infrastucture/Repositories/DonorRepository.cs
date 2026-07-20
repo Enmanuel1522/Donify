@@ -1,11 +1,11 @@
-﻿using Donify.API.Data;
-using Donify.API.Models.Entities;
-using Donify.API.Repositories.Interfaces;
+﻿using Donify.Infrastructure.Context;
+using Donify.Domain.Entities;
+using Donify.Domain.Repository;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Drawing;
 
-namespace Donify.API.Repositories
+namespace Donify.Infrastructure.Repositories
 {
     public class DonorRepository : GenericRepository<Donor>, IDonorRepository
     {

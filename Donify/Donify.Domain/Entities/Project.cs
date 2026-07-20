@@ -1,6 +1,6 @@
 ﻿using Donify.Domain.Core;
 
-namespace Donify.API.Models.Entities
+namespace Donify.Domain.Entities
 {
     public class Project : HasId
     {

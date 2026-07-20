@@ -1,59 +1,42 @@
-﻿using Donify.API.Data;
-using Donify.API.DTOs;
-using Donify.API.Models.Entities;
-using Donify.API.Repositories.Interfaces;
+﻿using Donify.Application.DTOs;
+using Donify.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Donify.API.Controllers
 {
     [ApiController]
-    [Route("api/[Controller]")]
+    [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly IUnitOfWork _uow;
+        private readonly IUserService _userService;
 
-        public UserController(IUnitOfWork uow)
+        public UserController(IUserService userService)
         {
-            _uow = uow;
+            _userService = userService;
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDto>> GetUser(int id)
         {
-            var user = await _uow.Users.GetByIdAsync(id);
+            var user = await _userService.GetByIdAsync(id);
             if (user == null)
                 return NotFound($"No se encontró un usuario con id {id}");
 
-            var dto = new UserDto
-            {
-                Id = user.Id,
-                Name = user.Name,
-                Email = user.Email,
-                Role = user.Role,
-                IsActive = user.IsActive,
-                CreatedAt = user.CreatedAt
-            };
-            return Ok(dto);
+            return Ok(user);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
+        {
+            var users = await _userService.GetAllAsync();
+            return Ok(users);
         }
 
         [HttpPost]
         public async Task<ActionResult<UserDto>> CreateUser(UserDto dto)
         {
-            var user = new User
-            {
-                Name = dto.Name,
-                Email = dto.Email,
-                PasswordHash = string.Empty,
-                Role = dto.Role,
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            await _uow.Users.AddAsync(user);
-            await _uow.SaveAsync();
-
-            dto.Id = user.Id;
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, dto);
+            var created = await _userService.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetUser), new { id = created.Id }, created);
         }
 
         [HttpPut("{id}")]
@@ -62,31 +45,14 @@ namespace Donify.API.Controllers
             if (id != dto.Id)
                 return BadRequest("El id de la ruta no coincide con el del cuerpo");
 
-            var user = await _uow.Users.GetByIdAsync(id);
-            if (user == null)
-                return NotFound($"No se encontró un usuario con id {id}");
-
-            user.Name = dto.Name;
-            user.Email = dto.Email;
-            user.Role = dto.Role;
-            user.IsActive = dto.IsActive;
-
-            await _uow.Users.UpdateAsync(user);
-            await _uow.SaveAsync();
-
+            await _userService.UpdateAsync(id, dto);
             return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await _uow.Users.GetByIdAsync(id);
-            if (user == null)
-                return NotFound($"No se encontró un usuario con id {id}");
-
-            await _uow.Users.DeleteAsync(id);
-            await _uow.SaveAsync();
-
+            await _userService.DeleteAsync(id);
             return NoContent();
         }
     }

@@ -1,10 +1,10 @@
-﻿using Donify.API.Data;
-using Donify.API.Repositories.Interfaces;
+﻿using Donify.Infrastructure.Context;
+using Donify.Domain.Repository;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 
-namespace Donify.API.Repositories
+namespace Donify.Infrastructure.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {

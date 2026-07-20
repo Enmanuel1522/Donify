@@ -1,6 +1,6 @@
-﻿using Donify.API.DTOs;
-using Donify.API.Models.Entities;
-using Donify.API.Repositories.Interfaces;
+﻿using Donify.Application.DTOs;
+using Donify.Domain.Entities;
+using Donify.Domain.Repository;
 using Donify.Application.Interfaces;
 
 namespace Donify.Application.Services

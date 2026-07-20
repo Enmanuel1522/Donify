@@ -2,7 +2,7 @@
 using System.ComponentModel.Design;
 using System.Data;
 
-namespace Donify.API.Models.Entities
+namespace Donify.Domain.Entities
 {
     public class Donor : HasId
     {

@@ -1,7 +1,7 @@
-﻿using Donify.API.Models.Entities;
+﻿using Donify.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
 
-namespace Donify.API.DTOs
+namespace Donify.Application.DTOs
 {
     public class UserDto
     {

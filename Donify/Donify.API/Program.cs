@@ -1,6 +1,6 @@
-using Donify.API.Data;
-using Donify.API.Repositories;
-using Donify.API.Repositories.Interfaces;
+using Donify.Infrastructure.Context;
+using Donify.Infrastructure.Repositories;
+using Donify.Domain.Repository;
 using Donify.Application.Interfaces;
 using Donify.Application.Services;
 using Microsoft.EntityFrameworkCore;

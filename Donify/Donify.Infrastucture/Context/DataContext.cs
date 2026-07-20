@@ -1,8 +1,8 @@
-﻿using Donify.API.Models.Entities;
+﻿using Donify.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 
-namespace Donify.API.Data
+namespace Donify.Infrastructure.Context
 {
     public class DataContext : DbContext
     {
