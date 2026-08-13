@@ -28,8 +28,6 @@ namespace Donify.API
             builder.Services.AddScoped<IStaffRepository, StaffRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-
-
             builder.Services.AddScoped<IDonorService, DonorService>();
             builder.Services.AddScoped<IDonationService, DonationService>();
             builder.Services.AddScoped<ICampaignService, CampaignService>();
@@ -39,13 +37,20 @@ namespace Donify.API
             builder.Services.AddScoped<IReceiptService, ReceiptService>();
             builder.Services.AddScoped<IUserService, UserService>();
 
-
+            //registra el servicio de CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend", policy =>
+                {
+                    policy.WithOrigins("http://localhost:5173")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
-
 
             var app = builder.Build();
 
@@ -65,10 +70,11 @@ namespace Donify.API
 
             app.UseHttpsRedirection();
 
+           
+            app.UseCors("AllowFrontend");
+
             app.UseAuthorization();
 
-
-               
             app.MapControllers();
 
             app.Run();
